@@ -1,44 +1,30 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import Routes from './routes/routes';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+import AppLoading from 'expo-app-loading';
+
+const getFonts = async () => await Font.loadAsync({
+  'poppins-bold': require('./assets/fonts/Poppins-Bold.ttf'),
+  'poppins-medium': require('./assets/fonts/Poppins-Medium.ttf'),
+});
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    'Inter-Black': require('./assets/fonts/Inter-Black.otf'),
-  });
-
-  useEffect(() => {
-    async function prepare() {
-      await SplashScreen.preventAutoHideAsync();
-    }
-    prepare();
-  }, []);
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   
+  if(!fontsLoaded){
+    return (
+      <AppLoading
+        startAsync={getFonts}
+        onFinish={() => setFontsLoaded(true)}
+        onError={console.warn}
+      />
+    ); 
+  }
+
   return (
     <NavigationContainer>
       <Routes></Routes>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
